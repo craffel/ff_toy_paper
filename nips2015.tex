@@ -61,9 +61,42 @@ The use of gating architectures \cite{}, sophisticated optimization techniques \
 However, these approaches do not solve this problem, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{}.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
-Attention
+\subsection{Attention}
 
-Simplified attention
+A recently proposed method for easier modeling of long-term dependencies is ``attention''.
+Attention mechanisms allow for a more direct dependence between the state of the model at different points in time.
+Following the definition from \cite{}, given a model which produces a hidden state $h_t$ at each time step, attention-based models first compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
+$$
+c_t = \sum_{j = 1}^T \alpha_{tj} h_j
+$$
+where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
+These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence prediction, the model's output at $t - 1$.
+The weightings $\alpha_{ij}$ are then computed by
+$$
+e_{tj} = a(s_{t - 1}, h_j),\; \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
+$$
+where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
+This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
+Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{}.
+RNNs with attention can be seen as analogous to the recently proposed Memory Network \cite{} and Neural Turing Machine \cite{} models.
+
+\subsection{Feed-Forward Attention}
+
+A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence classification tasks could be formulated as follows:
+Instead of a sequence of context vectors, we produce a single context vector $c$ as
+$$
+c = \sum_{t = 1}^T \alpha_t h_t,\; e_t = a(h_j),\; \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}
+$$
+As before, $a$ is a learnable function, but it now only depends on $h_j$.
+In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
+
+A consequence of using an attention mechanism is that the context vector $c$ can model temporal dependencies because attention performs integration over time.
+It follows that by using this simplified form of attention, a model could perform sequence classification even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
+While using a completely feed-forward model for sequential modeling tasks will sacrifice the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence classification more effectively than RNNs.
+
+We note here that feed-forward models can be used for sequence classification when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
+An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$.
+We will also explore the effectiveness of this approach for sequence classification.
 
 \section{Toy Long-Term Memory Problems}
 
