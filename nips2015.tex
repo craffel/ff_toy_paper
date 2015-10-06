@@ -46,26 +46,26 @@ Appropriate models for these tasks must be able to capture temporal dependencies
 \subsection{Recurrent Neural Networks}
 
 One such class of models are recurrent neural networks (RNNs).
-Recent advances in optimization techniques \cite{}, initialization methods \cite{}, and model architectures \cite{} have facilitated the success of RNNs in a wide variety of fields, including machine translation \cite{}, speech recognition \cite{}, handwriting recognition \cite{}, ...
+Recent advances in optimization techniques \cite{martens2011learning,sutskever2013importance}, initialization methods \cite{sutskever2013importance,jaegar2012long,mikolov2014learning,le2015simple}, and model architectures \cite{cho2014learning,hochreiter1997long} have facilitated the success of RNNs in a wide variety of fields, including machine translation \cite{cho2014learning,bahdanau2014neural,sutskever2014sequence}, speech recognition \cite{graves2012supervised,cho2015describing,sak2014long}, handwriting recognition \cite{graves2012supervised}, and text generation \cite{graves2013generating,pascanu2012difficulty,mikolov2014learning,le2015simple}.
 This variety of applications demonstrates their applicability to most machine learning tasks involving sequences.
 In their simplest form, RNNs can be considered as a learnable function $f$ whose output at time $t$ depends on input $x_t$ and the previous state $h_{t - 1}$:
 $$
 h_t = f(x_t, h_{t - 1})
 $$
 In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
-A common approach is to use backpropagation through time \cite{}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
+A common approach is to use backpropagation through time \cite{werbos1990backpropagation}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
 
 Despite the success of RNNs, their recursive nature makes them hard to both optimize and parallelize.
-Because the same function $f$ is applied repeatedly over time, the gradient with respect to its parameters can easily explode or vanish \cite{}.
-The use of gating architectures \cite{}, sophisticated optimization techniques \cite{}, gradient clipping \cite{}, and/or careful initialization \cite{} can help mitigate this issue.
-However, these approaches do not solve this problem, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{}.
+Because the same function $f$ is applied repeatedly over time, the gradient with respect to its parameters can easily explode or vanish \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}.
+The use of gating architectures \cite{hochreiter1997long,cho2014learning}, sophisticated optimization techniques \cite{sutskever2013importance,jaegar2012long,le2015simple}, gradient clipping \cite{pascanu2012difficulty,graves2013generating}, and/or careful initialization \cite{sutskever2013importance,jaegar2012long,mikolov2014learning,le2015simple} can help mitigate this issue.
+However, these approaches do not solve this problem, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{martens2011learning,sutskever2013importance,le2015simple,hochreiter1997long}.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
 \subsection{Attention}
 
 A recently proposed method for easier modeling of long-term dependencies is ``attention''.
 Attention mechanisms allow for a more direct dependence between the state of the model at different points in time.
-Following the definition from \cite{}, given a model which produces a hidden state $h_t$ at each time step, attention-based models first compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
+Following the definition from \cite{bahdanau2014neural}, given a model which produces a hidden state $h_t$ at each time step, attention-based models first compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
 $$
 c_t = \sum_{j = 1}^T \alpha_{tj} h_j
 $$
@@ -77,8 +77,8 @@ e_{tj} = a(s_{t - 1}, h_j),\; \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \
 $$
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
-Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{}.
-RNNs with attention can be seen as analogous to the recently proposed Memory Network \cite{} and Neural Turing Machine \cite{} models.
+Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{bahdanau2014neural,cho2015describing}.
+RNNs with attention can be seen as analogous to the recently proposed Memory Network \cite{weston2014memory,sukhbaatar2015end} and Neural Turing Machine \cite{graves2014neural} models.
 
 \subsection{Feed-Forward Attention}
 
@@ -109,5 +109,9 @@ Previous results
 \subsection{Variable-length Experiment}
 
 \section{Limitations}
+
+\bibliographystyle{unsrt}
+\small
+\bibliography{refs}
 
 \end{document}
