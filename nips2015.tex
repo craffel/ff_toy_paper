@@ -48,15 +48,15 @@ Appropriate models for these tasks must be able to capture temporal dependencies
 One such class of models are recurrent neural networks (RNNs).
 Recent advances in optimization techniques \cite{}, initialization methods \cite{}, and model architectures \cite{} have facilitated the success of RNNs in a wide variety of fields, including machine translation \cite{}, speech recognition \cite{}, handwriting recognition \cite{}, ...
 This variety of applications demonstrates their applicability to most machine learning tasks involving sequences.
-In their simplest form, RNNs can be considered as a function $f$ whose output at time $t$ depends on input $x_t$, the previous state $h_{t - 1}$, and the model's learnable parameters $\theta$:
+In their simplest form, RNNs can be considered as a learnable function $f$ whose output at time $t$ depends on input $x_t$ and the previous state $h_{t - 1}$:
 $$
-h_t = f(x_t, h_{t - 1}, \theta)
+h_t = f(x_t, h_{t - 1})
 $$
-In the supervised setting, the parameters $\theta$ are optimized with respect to a loss function which measures the performance of $f$.
-A common approach is to use backpropagation through time \cite{}, which ``unrolls'' the RNN over time steps to compute the gradient of $\theta$ with respect to the loss.
+In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
+A common approach is to use backpropagation through time \cite{}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
 
 Despite the success of RNNs, their recursive nature makes them hard to both optimize and parallelize.
-Because the same function $f$ is applied repeatedly over time, the gradient with respect to $\theta$ can easily explode or vanish \cite{}.
+Because the same function $f$ is applied repeatedly over time, the gradient with respect to its parameters can easily explode or vanish \cite{}.
 The use of gating architectures \cite{}, sophisticated optimization techniques \cite{}, gradient clipping \cite{}, and/or careful initialization \cite{} can help mitigate this issue.
 However, these approaches do not solve this problem, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{}.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
