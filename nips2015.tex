@@ -40,7 +40,7 @@ In fact, we show empirically that our model can solve these problems for sequenc
 \section{Models for Sequential Data}
 
 Many problems in machine learning are best formulated using sequential data, i.e.\ data where a given observation may be dependent on previous observations.
-Such problems can be coarsely classified as sequence transduction (producing a new sequence given an input sequence), sequence classification (producing a single label or vector from an entire sequence), or sequence generation (producing a sequence from no input) tasks.
+Such problems can be coarsely classified as sequence transduction (producing a new sequence given an input sequence), sequence embedding (producing a single label, value, or vector from an entire sequence), or sequence generation (producing a sequence from no input) tasks.
 Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 
 \subsection{Recurrent Neural Networks}
@@ -74,7 +74,7 @@ RNNs with attention can be seen as analogous to the recently proposed Memory Net
 
 \subsection{Feed-Forward Attention}
 
-A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence classification tasks could be formulated as follows:
+A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence embedding tasks could be formulated as follows:
 Instead of a sequence of context vectors, we produce a single context vector $c$ as
 $$
 c = \sum_{t = 1}^T \alpha_t h_t,\; e_t = a(h_j),\; \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}
@@ -83,12 +83,12 @@ As before, $a$ is a learnable function, but it now only depends on $h_j$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
 
 A consequence of using an attention mechanism is that the context vector $c$ can model temporal dependencies because attention performs integration over time.
-It follows that by using this simplified form of attention, a model could perform sequence classification even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
-While using a completely feed-forward model for sequential modeling tasks will sacrifice the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence classification more effectively than RNNs.
+It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
+While using a completely feed-forward model for sequential modeling tasks will sacrifice the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding more effectively than RNNs.
 
-We note here that feed-forward models can be used for sequence classification when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
+We note here that feed-forward models can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$.
-We will also explore the effectiveness of this approach for sequence classification.
+We will also explore the effectiveness of this approach for sequence embedding.
 
 \section{Toy Long-Term Memory Problems}
 
