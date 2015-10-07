@@ -92,15 +92,27 @@ We will also explore the effectiveness of this approach for sequence embedding.
 
 \section{Toy Long-Term Memory Problems}
 
-Different tasks
+A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
+In this paper, we will focus on the adding and multiplication problems from \cite{hochreiter1997long} and the XOR problem from \cite{martens2011learning}.
+These tasks can be summarized as follows:
+The input is a two dimensional sequence, where one dimension is a random sequence (sampled uniformly from $[0, 1]$ in the addition and multiplication tasks and from $\{0, 1\}$ in the XOR task) and the other dimension is a ``mask'' sequence.
+At two time steps, one in the first ten sequence steps and one before the sequence's midpoint, the ``mask'' signal is 1; at the first and last time step it is -1; and at all other time steps it is 0.
+The goal is to perform addition, multiplication, or exclusive-or on the two values in the noise dimension which co-occur with the 1s in the mask dimension, which is meant to require that a model be able to store the correct values for the duration of the sequence.
+Slight variants of these tasks have also been used \cite{sutskever2013importance,le2015simple,jaegar2012long,martens2011learning}, but we will follow the original definition from \cite{hochreiter1997long}.
+These three tasks are only a subset of the synthetic long-term memory problems which have been proposed; we focus on them here because they are the most commonly used and discuss the applicability of feed-forward attention on the remaining problems in Section \ref{sec:limitations}.
+
+
 
 Previous results
+
+\subsection{Model Details}
 
 \subsection{Fixed-Length Experiment}
 
 \subsection{Variable-length Experiment}
 
 \section{Limitations}
+\label{sec:limitations}
 
 \bibliographystyle{unsrt}
 \small
