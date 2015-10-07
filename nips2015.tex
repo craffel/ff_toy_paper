@@ -2,6 +2,7 @@
 \usepackage{nips15submit_e,times}
 \usepackage{hyperref}
 \usepackage{url}
+\usepackage{amssymb}
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 
@@ -76,9 +77,10 @@ RNNs with attention can be seen as analogous to the recently proposed Memory Net
 
 A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence embedding tasks could be formulated as follows:
 Instead of a sequence of context vectors, we produce a single context vector $c$ as
-$$
+\begin{equation}
+\label{eq:ffattention}
 c = \sum_{t = 1}^T \alpha_t h_t,\; e_t = a(h_j),\; \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}
-$$
+\end{equation}
 As before, $a$ is a learnable function, but it now only depends on $h_j$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
 
@@ -98,16 +100,27 @@ These tasks can be summarized as follows:
 The input is a two dimensional sequence, where one dimension is a random sequence (sampled uniformly from $[0, 1]$ in the addition and multiplication tasks and from $\{0, 1\}$ in the XOR task) and the other dimension is a ``mask'' sequence.
 At two time steps, one in the first ten sequence steps and one before the sequence's midpoint, the ``mask'' signal is 1; at the first and last time step it is -1; and at all other time steps it is 0.
 The goal is to perform addition, multiplication, or exclusive-or on the two values in the noise dimension which co-occur with the 1s in the mask dimension, which is meant to require that a model be able to store the correct values for the duration of the sequence.
+A sequence is considered correctly processed if the absolute difference between the predicted and target values is less than $.04$.
 Slight variants of these tasks have also been used \cite{sutskever2013importance,le2015simple,jaegar2012long,martens2011learning}, but we will follow the original definition from \cite{hochreiter1997long}.
 These three tasks are only a subset of the synthetic long-term memory problems which have been proposed; we focus on them here because they are the most commonly used and discuss the applicability of feed-forward attention on the remaining problems in Section \ref{sec:limitations}.
 
-
-
-Previous results
-
 \subsection{Model Details}
 
+For all experiments, we used the following model:
+First, the state $h_t$ was computed from input at each time step $x_t$ by $h_t = \max(W_{xh}x_t + b_{xh}, 0)$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
+We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$ where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$.
+We then computed an intermediate vector $s = \max(W_{cs}c + b_{cs}, 0)$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \max(W_{sy}s + b_{sy}, 0)$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
+For all experiments, we set $D = 100$.
+We used the squared error of the output $y$ against the target value for each sequence as an objective, and optimized parameters using Nesterov's accelerated gradient \cite{sutskever2013importance}.
+$W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he2015delving}; $b_{xh}, b_{hc}, b_{cs}$ were all initialized to 0 vectors, and $b_{so}$ was initialized to the mean target value for each task (.5 for addition and XOR, .25 for multiplication).
+We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
+We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
+All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
+For further details, our code is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
+
 \subsection{Fixed-Length Experiment}
+
+Previous results
 
 \subsection{Variable-length Experiment}
 
