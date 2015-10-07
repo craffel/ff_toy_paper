@@ -3,6 +3,8 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{amssymb}
+\usepackage{booktabs}
+
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 
@@ -86,6 +88,7 @@ In this formulation, attention can be seen as producing a fixed-length embedding
 
 A consequence of using an attention mechanism is that the context vector $c$ can model temporal dependencies because attention performs integration over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
+% TODO: MORE EFFICIENT
 While using a completely feed-forward model for sequential modeling tasks will sacrifice the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding more effectively than RNNs.
 
 We note here that feed-forward models can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
@@ -118,9 +121,37 @@ We stopped training when either 100\% accuracy was attained on the test set, or 
 All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
 For further details, our code is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
 
-\subsection{Fixed-Length Experiment}
+\begin{table}
+  \centering
+  \scriptsize
+  \begin{tabular}{r c c c c c c c c c c c c c c c}
+    \toprule
+    Task & \multicolumn{5}{c}{Addition} & \multicolumn{5}{c}{Multiplication} & \multicolumn{5}{c}{XOR} \\
+    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 \\
+%    $T_0$ & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 \\
+    \cmidrule(r){2-6}
+    \cmidrule(r){7-11}
+    \cmidrule(r){12-16}
+    Attention & 1 & 1 & 2 & 2 & 8 & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+    Unweighted & 1 & 2 & 2 & 4 & \textcolor{gray}{18.5\%} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+    \bottomrule
+  \end{tabular}
+  \caption{Number of epochs required to achieve perfect accuracy or accuracy after 100 epochs (greyed-out values) for the experiment described in Section \ref{sec:fixed}.}
+  \label{tab:fixed}
+\end{table}
 
-Previous results
+\subsection{Fixed-Length Experiment}
+\label{sec:fixed}
+
+Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
+As $T_0$ increases, the model must be able to handle longer term dependencies.
+The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks and papers; as a rough overview \cite{sutskever2013importance} uses $T_0 = 80$, \cite{le2015simple,martens2011learning} achieve success for $T_0 \le 250$, and \cite{jaegar2012long,hochreiter1997long} achieve success for $T_0 \le 1000$ except \cite{jaegar2012long} solves the addition task for $T_0 = 10000$.
+We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000\}$.
+The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
+For fair comparison, we report the best result achieved using any learning rate in $\{.001, .01, .05, .1\}$ and any momentum in $\{.9, .99\}$.
+From these results, it's clear that the feed-forward attention model can solve problems intended to test long-term memory, with longer sequence lengths than have been achieved for RNNs.
+Our model is also extremely efficient: Processing one epoch of 100,000 sequences with $T_0 = 5000$ took about two minutes using an NVIDIA GTX 980 Ti GPU.
+In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in parameters.
 
 \subsection{Variable-length Experiment}
 
