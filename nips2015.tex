@@ -126,7 +126,6 @@ $W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
 All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
-For further details, our code is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
 
 \begin{table}
   \centering
@@ -170,8 +169,14 @@ Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test
 This suggests that a single feed-forward network with attention can simultaneously model both short-term and long-term dependencies, with a marginal decrease in accuracy.
 We were not able to successfully train any models which used an unweighted average over time on this task. 
 
-\section{Limitations}
+\section{Discussion}
 \label{sec:limitations}
+
+A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards temporal information.
+For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$, $Y, Y$, $X, Y$, or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
+Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
+In these cases, our results suggest that a completely feed-forward attention-based network could substantially outperform recurrent models.
+Further investigation on real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
 
 \bibliographystyle{unsrt}
 \small
