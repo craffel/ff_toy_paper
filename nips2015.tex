@@ -95,8 +95,8 @@ In this formulation, attention can be seen as producing a fixed-length embedding
 
 A consequence of using an attention mechanism is that the context vector $c$ can model temporal dependencies because attention performs integration over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
-% TODO: MORE EFFICIENT
-While using a completely feed-forward model for sequential modeling tasks will sacrifice the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding more effectively than RNNs.
+Using a feed-forward $f$ could also result in large efficiency gains as the computation could be completely parallelized.
+While using a feed-forward model for sequential modeling tasks sacrifices its ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding more effectively than RNNs.
 
 We note here that feed-forward models can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$.
