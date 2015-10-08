@@ -50,12 +50,12 @@ In fact, we show empirically that our model can solve these problems for sequenc
 \section{Models for Sequential Data}
 
 Many problems in machine learning are best formulated using sequential data, i.e.\ data where a given observation may be dependent on previous observations.
-Such problems can be coarsely classified as sequence transduction (producing a new sequence given an input sequence), sequence embedding (producing a single label, value, or vector from an entire sequence), or sequence generation (producing a sequence from no input) tasks.
+Such problems can be coarsely classified as sequence transduction (producing a new sequence given an input sequence), sequence embedding (producing a single label, value, or vector from an entire sequence), or sequence generation (producing a sequence from no input).
 Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 
 \subsection{Recurrent Neural Networks}
 
-One such class of models are recurrent neural networks (RNNs), which can be considered as a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the previous state $h_{t - 1}$.
+One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the previous state $h_{t - 1}$.
 In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
 A common approach is to use backpropagation through time \cite{werbos1990backpropagation}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
 Because the same function $f$ is applied repeatedly over time, this gradient can easily explode or vanish \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}.
@@ -105,7 +105,7 @@ We will also explore the effectiveness of this approach for sequence embedding.
 \section{Toy Long-Term Memory Problems}
 
 A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
-In this paper, we will focus on the adding and multiplication problems from \cite{hochreiter1997long} and the XOR problem from \cite{martens2011learning}.
+In this paper, we will focus on the addition and multiplication problems from \cite{hochreiter1997long} and the XOR problem from \cite{martens2011learning}.
 These tasks can be summarized as follows:
 The input is a two dimensional sequence, where one dimension is a random sequence (sampled uniformly from $[0, 1]$ in the addition and multiplication tasks and from $\{0, 1\}$ in the XOR task) and the other dimension is a ``mask'' sequence.
 At two time steps, one in the first ten sequence steps and one before the sequence's midpoint, the ``mask'' signal is 1; at the first and last time step it is -1; and at all other time steps it is 0.
@@ -156,13 +156,13 @@ The largest value of $T_0$ for which high accuracy was attained on a held-out te
 We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.001, .01, .05, .1\}$ and any momentum in $\{.9, .99\}$.
-From these results, it's clear that the feed-forward attention model can solve problems intended to test long-term memory, with longer sequence lengths than have been achieved for RNNs.
+From these results, it's clear that the feed-forward attention model can solve problems intended to test long-term memory with longer sequence lengths than have been achieved for RNNs.
 Our model is also extremely efficient: Processing one epoch of 100,000 sequences with $T_0 = 5000$ took about two minutes using an NVIDIA GTX 980 Ti GPU.
 In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in parameters.
 
 \subsection{Variable-length Experiment}
 
-Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we chose, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
+Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such an experiment has not been conducted with RNNs.
 We trained models of the same architecture as used in the previous experiment on sequences with lengths varying uniformly from 50 to 5000 time steps.
 Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.1\% accuracy on the addition task, --\% on the multiplication task, and --\% on the XOR task.
@@ -173,7 +173,7 @@ We were not able to successfully train any models which used an unweighted avera
 \label{sec:limitations}
 
 A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards temporal information.
-For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$, $Y, Y$, $X, Y$, or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
+For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
 Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
 In these cases, our results suggest that a completely feed-forward attention-based network could substantially outperform recurrent models.
 Further investigation on real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
