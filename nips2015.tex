@@ -11,7 +11,7 @@
 \renewcommand\thebibliography[1]{
   \OLDthebibliography{#1}
   \setlength{\parskip}{0pt}
-  \setlength{\itemsep}{.5pt}
+  \setlength{\itemsep}{1pt}
 }
 
 
@@ -105,14 +105,13 @@ We will also explore the effectiveness of this approach for sequence embedding.
 \section{Toy Long-Term Memory Problems}
 
 A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
-In this paper, we will focus on the addition and multiplication problems from \cite{hochreiter1997long} and the XOR problem from \cite{martens2011learning}.
-These tasks can be summarized as follows:
-The input is a two dimensional sequence, where one dimension is a random sequence (sampled uniformly from $[0, 1]$ in the addition and multiplication tasks and from $\{0, 1\}$ in the XOR task) and the other dimension is a ``mask'' sequence.
+In this paper, we will focus on the ``addition'' and ``multiplication'' problems, which can be summarized as follows:
+The input is a two dimensional sequence, where one dimension is a random sequence sampled uniformly from $[0, 1]$ and the other dimension is a ``mask'' sequence.
 At two time steps, one in the first ten sequence steps and one before the sequence's midpoint, the ``mask'' signal is 1; at the first and last time step it is -1; and at all other time steps it is 0.
-The goal is to perform addition, multiplication, or exclusive-or on the two values in the noise dimension which co-occur with the 1s in the mask dimension, which is meant to require that a model be able to store the correct values for the duration of the sequence.
+The goal is to perform addition or multiplication on the two values in the noise dimension which co-occur with the 1s in the mask dimension, which is meant to require that a model be able to store the correct values for the duration of the sequence.
 A sequence is considered correctly processed if the absolute difference between the predicted and target values is less than $.04$.
 Slight variants of these tasks have also been used \cite{sutskever2013importance,le2015simple,jaegar2012long,martens2011learning}, but we will follow the original definition from \cite{hochreiter1997long}.
-These three tasks are only a subset of the synthetic long-term memory problems which have been proposed; we focus on them here because they are the most commonly used and discuss the applicability of feed-forward attention on the remaining problems in Section \ref{sec:limitations}.
+These two tasks are only a subset of the synthetic long-term memory problems which have been proposed; we focus on them here because they are the most commonly used and discuss the applicability of feed-forward attention on the remaining problems in Section \ref{sec:limitations}.
 
 \subsection{Model Details}
 
@@ -122,27 +121,26 @@ We tested models where the context vector $c$ was then computed either as in Equ
 We then computed an intermediate vector $s = \max(W_{cs}c + b_{cs}, 0)$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \max(W_{sy}s + b_{sy}, 0)$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
 For all experiments, we set $D = 100$.
 We used the squared error of the output $y$ against the target value for each sequence as an objective, and optimized parameters using Nesterov's accelerated gradient \cite{sutskever2013importance}.
-$W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he2015delving}; $b_{xh}, b_{hc}, b_{cs}$ were all initialized to 0 vectors, and $b_{so}$ was initialized to the mean target value for each task (.5 for addition and XOR, .25 for multiplication).
+$W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he2015delving} and $b_{xh}, b_{hc}, b_{cs}, b_{so}$ were all initialized to 0 vectors.
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
 All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
 
 \begin{table}
   \centering
-  \scriptsize
-  \begin{tabular}{r c c c c c c c c c c c c c c c}
+  \small
+  \begin{tabular}{r c c c c c c c c c c}
     \toprule
-    Task & \multicolumn{5}{c}{Addition} & \multicolumn{5}{c}{Multiplication} & \multicolumn{5}{c}{XOR} \\
-    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 \\
-%    $T_0$ & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 \\
+    Task & \multicolumn{5}{c}{Addition} & \multicolumn{5}{c}{Multiplication} \\
+    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 \\
+%    $T_0$ & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 \\
     \cmidrule(r){2-6}
     \cmidrule(r){7-11}
-    \cmidrule(r){12-16}
-    Attention & 1 & 1 & 2 & 2 & 8 & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
-    Unweighted & 1 & 2 & 2 & 4 & \textcolor{gray}{18.5\%} & -- & -- & -- & -- & -- & -- & -- & -- & -- & -- \\
+    Attention & 1 & 1 & 2 & 2 & 8 & 1 & 3 & 25 & 58 & -- \\
+    Unweighted & 1 & 2 & 2 & 4 & \textcolor{gray}{18.5\%} & 18 & 5 & 48 & 94 & -- \\
     \bottomrule
   \end{tabular}
-  \caption{Number of epochs required to achieve perfect accuracy or accuracy after 100 epochs (greyed-out values) for the experiment described in Section \ref{sec:fixed}.}
+  \caption{Number of epochs required to achieve perfect accuracy, or accuracy after 100 epochs (greyed-out values), for the experiment described in Section \ref{sec:fixed}.}
   \label{tab:fixed}
 \end{table}
 \setlength{\textfloatsep}{14pt}
@@ -165,7 +163,7 @@ In addition, there is a clear benefit to using the attention mechanism of Equati
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such an experiment has not been conducted with RNNs.
 We trained models of the same architecture as used in the previous experiment on sequences with lengths varying uniformly from 50 to 5000 time steps.
-Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.1\% accuracy on the addition task, --\% on the multiplication task, and --\% on the XOR task.
+Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.1\% accuracy on the addition task and --\% on the multiplication task.
 This suggests that a single feed-forward network with attention can simultaneously model both short-term and long-term dependencies, with a marginal decrease in accuracy.
 We were not able to successfully train any models which used an unweighted average over time on this task. 
 
