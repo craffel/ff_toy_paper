@@ -33,7 +33,7 @@ LabROSA, Columbia University\\
 Recurrent neural networks (RNNs) have proven to be powerful models in problems where variable-length sequences are projected into a fixed-dimensional embedded space.
 Recently, RNNs have been augmented with ``attention'' mechanisms which allow the network to focus on different parts of an input sequence when computing their output.
 We propose a simplified model of attention which is applicable to feed-forward neural networks and demonstrate that it can solve some long-term memory problems (specifically, those where temporal order doesn't matter).
-In fact, we show empirically that our model can solve these problems for sequence lengths which are comparable in length and more widely varying than the best results attained with RNNs.
+In fact, we show empirically that our model can solve these problems for sequence lengths which are both longer and more widely varying than the best results attained with RNNs.
 \end{abstract}
 
 \section{Models for Sequential Data}
@@ -105,11 +105,14 @@ These two tasks are only a subset of the synthetic long-term memory problems whi
 \subsection{Model Details}
 
 For all experiments, we used the following model:
-First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \max(W_{xh}x_t + b_{xh}, 0)$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
+First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \max(W_{xh}x_t + b_{xh}, 0.01)$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
 We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$ where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$.
-We then computed an intermediate vector $s = \max(W_{cs}c + b_{cs}, 0)$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \max(W_{sy}s + b_{sy}, 0)$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
+We then computed an intermediate vector $s = \max(W_{cs}c + b_{cs}, 0.01)$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \max(W_{sy}s + b_{sy}, 0.01)$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
+The ``leaky rectifier'' nonlinearity $\textrm{LReLU}(x) = \max(x, .01)$ was proposed in \cite{maas2013rectifier}; we found that it improved early convergence so we used it in all of our models.
 For all experiments, we set $D = 100$.
-We used the squared error of the output $y$ against the target value for each sequence as an objective, and optimized parameters using Nesterov's accelerated gradient \cite{sutskever2013importance}.
+
+We used the squared error of the output $y$ against the target value for each sequence as an objective.
+Parameters were optimized using ``adam'', a recently proposed stochastic optimization technique \cite{kingma2014adam}, with the optimization hyperparameters $\beta_1$ and $\beta_2$ set to the values suggested in \cite{kingma2014adam} (.9 and .999 respectively).
 $W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he2015delving} and $b_{xh}, b_{hc}, b_{cs}, b_{so}$ were all initialized to 0 vectors.
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
@@ -117,16 +120,19 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
 
 \begin{table}
   \centering
-  \small
-  \begin{tabular}{r c c c c c c c c c c}
+  \begin{tabular}{r c c c c c c}
     \toprule
-    Task & \multicolumn{5}{c}{Addition} & \multicolumn{5}{c}{Multiplication} \\
-    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 50 & 100 & 500 & 1000 & 5000 \\
-%    $T_0$ & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 & 5e1 & 1e2 & 5e2 & 1e3 & 5e3 \\
-    \cmidrule(r){2-6}
-    \cmidrule(r){7-11}
-    Attention & 1 & 1 & 2 & 2 & 8 & 1 & 3 & 25 & 58 & \textcolor{gray}{74.1\%} \\
-    Unweighted & 1 & 2 & 2 & 4 & \textcolor{gray}{18.5\%} & 18 & 5 & 48 & 94 & \textcolor{gray}{16.0\%} \\
+    \multicolumn{7}{c}{\textbf{Addition}} \\
+    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
+    \cmidrule(r){2-7}
+    Attention & 1 & 1 & 1 & 1 & 2 & 3 \\
+    Unweighted & 1 & 1 & 1 & 2 & 8 & 17 \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Multiplication}} \\
+    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
+    \cmidrule(r){2-7}
+    Attention & 1 & 2 & 4 & 2 & 15 & 6 \\
+    Unweighted & 2 & 2 & 8 & 33 & \textcolor{gray}{89.8\%} & \textcolor{gray}{80.8\%} \\
     \bottomrule
   \end{tabular}
   \caption{Number of epochs required to achieve perfect accuracy, or accuracy after 100 epochs (greyed-out values), for the experiment described in Section \ref{sec:fixed}.}
@@ -140,9 +146,9 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
 Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
 As $T_0$ increases, the model must be able to handle longer term dependencies.
 The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks and papers; as a rough overview \cite{sutskever2013importance} uses $T_0 = 80$, \cite{le2015simple,martens2011learning} achieve success for $T_0 \le 250$, and \cite{jaegar2012long,hochreiter1997long} achieve success for $T_0 \le 1000$ except \cite{jaegar2012long} solves the addition task for $T_0 = 10000$.
-We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000\}$.
+We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000, 10000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
-For fair comparison, we report the best result achieved using any learning rate in $\{.001, .01, .05, .1\}$ and any momentum in $\{.9, .99\}$.
+For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
 From these results, it's clear that the feed-forward attention model can solve these long-term memory problems with comparable, and sometimes longer, sequence lengths than have been achieved with RNNs.
 Our model is also extremely efficient: Processing one epoch of 100,000 sequences with $T_0 = 5000$ took about two minutes using an NVIDIA GTX 980 Ti GPU.
 In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in parameters.
@@ -151,10 +157,10 @@ In addition, there is a clear benefit to using the attention mechanism of Equati
 
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such an experiment has not been conducted with RNNs.
-We trained models of the same architecture as used in the previous experiment on sequences with lengths varying uniformly from 50 to 10000 time steps for the addition task and 50 to 1000 for the multiplication task.
-Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 95.9\% accuracy on the addition task and 99.7\% on the multiplication task.
+We trained models of the same architecture as used in the previous experiment on sequences with lengths varying uniformly from 50 to 10000 time steps.
+Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task.
 This suggests that a single feed-forward network with attention can simultaneously model both short-term and long-term dependencies, with a marginal decrease in accuracy.
-We were not able to successfully train any models which used an unweighted average over time on widely-variable-length sequences.
+Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
 \section{Discussion}
 \label{sec:limitations}
