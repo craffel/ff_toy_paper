@@ -3,6 +3,7 @@
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{amssymb}
+\usepackage{amsmath}
 \usepackage{booktabs}
 
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
@@ -63,9 +64,10 @@ $$
 where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
 These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence prediction, the model's output at $t - 1$.
 The weightings $\alpha_{ij}$ are then computed by
-$$
-e_{tj} = a(s_{t - 1}, h_j),\; \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
-$$
+\begin{align*}
+e_{tj} &= a(s_{t - 1}, h_j)\\
+\alpha_{tj} &= \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
+\end{align*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
 Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{bahdanau2014neural,cho2015describing}.
@@ -75,10 +77,14 @@ RNNs with attention can be seen as analogous to the recently proposed Memory Net
 
 A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence embedding tasks could be formulated as follows:
 Instead of a sequence of context vectors, we produce a single context vector $c$ as
-\begin{equation}
+\begin{align}
+\begin{split}
 \label{eq:ffattention}
- e_t = a(h_t),\; \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}, \; c = \sum_{t = 1}^T \alpha_t h_t
-\end{equation}
+e_t &= a(h_t)\\
+\alpha_t &= \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}\\
+c &= \sum_{t = 1}^T \alpha_t h_t
+\end{split}
+\end{align}
 As before, $a$ is a learnable function, but it now only depends on $h_t$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
 
@@ -88,7 +94,11 @@ Using a feed-forward $f$ could also result in large efficiency gains as the comp
 While using a feed-forward model for sequential modeling sacrifices the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding as effectively than RNNs.
 
 We note here that feed-forward models without attention can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
-An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$.
+An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$, i.e.
+\begin{equation}
+\label{eq:unweighted}
+c = \frac{1}{T}\sum_{t = 1}^T h_t
+\end{equation}
 We will also explore the effectiveness of this approach for sequence embedding.
 
 \section{Toy Long-Term Memory Problems}
@@ -105,9 +115,25 @@ These two tasks are only a subset of the synthetic long-term memory problems whi
 \subsection{Model Details}
 
 For all experiments, we used the following model:
-First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \max(W_{xh}x_t + b_{xh}, 0.01)$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
-We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$ where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$.
-We then computed an intermediate vector $s = \max(W_{cs}c + b_{cs}, 0.01)$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \max(W_{sy}s + b_{sy}, 0.01)$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
+First, the state $h_t$ was computed from the input at each time step $x_t$ by 
+$$
+h_t = \max(W_{xh}x_t + b_{xh}, 0.01)
+$$
+where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
+We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with 
+$$
+a(h_t) =\tanh(W_{hc}h_t + b_{hc})
+$$
+where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation \ref{eq:unweighted}.
+We then computed an intermediate vector 
+$$
+s = \max(W_{cs}c + b_{cs}, 0.01)
+$$
+where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as
+$$
+y = \max(W_{sy}s + b_{sy}, 0.01)
+$$
+where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
 The ``leaky rectifier'' nonlinearity $\textrm{LReLU}(x) = \max(x, .01)$ was proposed in \cite{maas2013rectifier}; we found that it improved early convergence so we used it in all of our models.
 For all experiments, we set $D = 100$.
 
