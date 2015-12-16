@@ -158,13 +158,13 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
   \begin{tabular}{r c c c c c c}
     \toprule
     \multicolumn{7}{c}{\textbf{Addition}} \\
-    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
+    Sequence length ($T_0$) & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
     \cmidrule(r){2-7}
     Attention & 1 & 1 & 1 & 1 & 2 & 3 \\
     Unweighted & 1 & 1 & 1 & 2 & 8 & 17 \\
     \midrule
     \multicolumn{7}{c}{\textbf{Multiplication}} \\
-    $T_0$ & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
+    Sequence length ($T_0$) & 50 & 100 & 500 & 1000 & 5000 & 10000 \\
     \cmidrule(r){2-7}
     Attention & 1 & 2 & 4 & 2 & 15 & 6 \\
     Unweighted & 2 & 2 & 8 & 33 & \textcolor{gray}{89.8\%} & \textcolor{gray}{80.8\%} \\
