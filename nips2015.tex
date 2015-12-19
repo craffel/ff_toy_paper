@@ -181,7 +181,15 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
 
 Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
 As $T_0$ increases, the model must be able to handle longer term dependencies.
-The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks and papers; as a rough overview \cite{sutskever2013importance} uses $T_0 = 80$, \cite{le2015simple,martens2011learning} achieve success for $T_0 \le 250$, and \cite{jaegar2012long,hochreiter1997long} achieve success for $T_0 \le 1000$ except \cite{jaegar2012long} solves the addition task for $T_0 = 10000$.
+The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks and papers.
+In the original paper describing the long short-term memory (LSTM) architecture \cite{hochreiter1997long}, a small LSTM network was shown to be able to solve the addition problem up to $T_0 = 1000$ and the multiplication problem up to $T_0 = 100$.
+\cite{martens2011learning} later showed that a ``vanilla'' (single-layer, densely-connected) recurrent network could solve both the addition and multiplication problems for $T_0 = 200$ when Hessian-Free optimization was used.
+The same model was used in \cite{sutskever2013importance}, where Nesterov's Accelerated Gradient was used instead for optimization which allowed the model to solve the addition and multiplication problems for $T_0 = 80$.
+By initializing a similarly structured recurrent network's hidden-to-hidden weights to an identity matrix and using a rectifier activation function, \cite{le2015simple} solved the addition problem up to $T_0 = 300$, which they claimed outperformed an LSTM model.
+More recently, \cite{krueger2015regularizing} utilized a regularizer which encourages subsequent hidden states to have similar norms, allowing a vanilla recurrent network to achieve some success on the addition problem for $T_0 = 400$.
+Related work in \cite{arjovsky2015unitary} showed that enforcing an orthogonality constraint on the hidden-to-hidden weight matrix of a vanilla RNN allowed it to nearly solve the addition problem for $T_0 = 400$ and achieve some success for $T_0 = 750$.
+Finally, in \cite{jaegar2012long} the addition and multiplication tasks were solved for $T_0 = 10000$ and $T_0 = 1000$ respectively by using a recurrent network with a very large and carefully initialized hidden-to-hidden weight matrix which was not optimized, which sidesteps the issue of vanishing and exploding gradients.
+
 We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000, 10000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
