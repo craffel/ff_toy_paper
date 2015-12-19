@@ -192,9 +192,9 @@ In addition, there is a clear benefit to using the attention mechanism of Equati
 
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such an experiment has not been conducted with RNNs.
-We trained models of the same architecture as used in the previous experiment on sequences with lengths varying uniformly from 50 to 10000 time steps.
-Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task.
-This suggests that a single feed-forward network with attention can simultaneously model both short-term and long-term dependencies, with a marginal decrease in accuracy.
+We trained models of the same architecture as used in the previous experiment on minibatches of sequences whose lengths were chosen uniformly at random between 50 and 10000 time steps.
+Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task after training for 100 epochs.
+This suggests that a single feed-forward network with attention can simultaneously model both short-term and very long-term dependencies, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
 \section{Discussion}
