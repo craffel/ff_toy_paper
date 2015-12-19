@@ -148,7 +148,8 @@ For all experiments, we set $D = 100$.
 
 We used the squared error of the output $y$ against the target value for each sequence as an objective.
 Parameters were optimized using ``adam'', a recently proposed stochastic optimization technique \cite{kingma2014adam}, with the optimization hyperparameters $\beta_1$ and $\beta_2$ set to the values suggested in \cite{kingma2014adam} (.9 and .999 respectively).
-$W_{xh}, W_{hc}, W_{cs}, W_{so}$ were all initialized using He's method \cite{he2015delving} and $b_{xh}, b_{hc}, b_{cs}, b_{so}$ were all initialized to 0 vectors.
+All weight matrices were initialized with entries drawn from a Gaussian distribution with mean zero and, for a matrix $W \in \mathbb{R}^{M \times N}$, a standard deviation of $1/\sqrt{N}$.
+All bias vectors were initialized with zeros.
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
 All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
