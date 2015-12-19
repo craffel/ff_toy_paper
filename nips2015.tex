@@ -72,7 +72,7 @@ e_{tj} &= a(s_{t - 1}, h_j)\\
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
 Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{bahdanau2014neural,cho2015describing}.
-RNNs with attention can be seen as analogous to the recently proposed Memory Network \cite{weston2014memory,sukhbaatar2015end} and Neural Turing Machine \cite{graves2014neural} models.
+Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \cite{graves2014neural} and End-To-End Memory Network \cite{sukhbaatar2015end} models.
 
 \subsection{Feed-Forward Attention}
 
