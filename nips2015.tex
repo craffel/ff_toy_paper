@@ -186,7 +186,7 @@ The required number of epochs or accuracy after 100 epochs for each task, sequen
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
 From these results, it's clear that the feed-forward attention model can solve these long-term memory problems with comparable, and sometimes longer, sequence lengths than have been achieved with RNNs.
 Our model is also extremely efficient: Processing one epoch of 100,000 sequences with $T_0 = 5000$ took about two minutes using an NVIDIA GTX 980 Ti GPU.
-In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in parameters.
+In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in the number of parameters (10,602 vs.\ 10,501, or less than 1\%).
 
 \subsection{Variable-length Experiment}
 
