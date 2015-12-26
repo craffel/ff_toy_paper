@@ -213,8 +213,10 @@ Using an unweighted average over time, we were only able to achieve accuracies o
 A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards temporal information.
 For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
 Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
-In these cases, our results suggest that a completely feed-forward attention-based network could be substantially more efficient than recurrent models.
-Further investigation on real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
+For example, in Joachims' seminal paper on text document categorization, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks'' \cite{joachims1998text}.
+We also have shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
+Our results here further demonstrate that our model can be substantially more efficient than recurrent models on some classic long-term memory tasks.
+Further investigation on more real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
 
 \bibliographystyle{unsrt}
 \bibliography{refs}
