@@ -50,8 +50,8 @@ One such class of models are recurrent neural networks (RNNs), which can be cons
 In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
 A common approach is to use backpropagation through time \cite{werbos1990backpropagation}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
 Because the same function $f$ is applied repeatedly over time, this gradient can easily explode or vanish \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}.
-The use of gating architectures \cite{hochreiter1997long,cho2014learning}, sophisticated optimization techniques \cite{martens2011learning,sutskever2013importance}, gradient clipping \cite{pascanu2012difficulty,graves2013generating}, and/or careful initialization \cite{sutskever2013importance,jaegar2012long,mikolov2014learning,le2015simple} can help mitigate this issue and has facilitated the success of RNNs in a variety of fields (see e.g.\ \cite{graves2012supervised,cho2015describing} for an overview).
-However, these approaches don't \textit{solve} the problem of vanishing and exploding gradients, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{martens2011learning,sutskever2013importance,le2015simple,hochreiter1997long}.
+The use of gating architectures \cite{hochreiter1997long,cho2014learning}, sophisticated optimization techniques \cite{martens2011learning,sutskever2013importance}, gradient clipping \cite{pascanu2012difficulty,graves2013generating}, and/or careful initialization \cite{sutskever2013importance,jaegar2012long,mikolov2014learning,le2015simple} can help mitigate this issue and has facilitated the success of RNNs in a variety of fields (see e.g.\ \cite{graves2012supervised} for an overview).
+However, these approaches don't \textit{solve} the problem of vanishing and exploding gradients, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{martens2011learning,sutskever2013importance,le2015simple,hochreiter1997long,krueger2015regularizing,arjovsky2015unitary}.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
 \subsection{Attention}
@@ -71,7 +71,7 @@ e_{tj} &= a(s_{t - 1}, h_j)\\
 \end{align*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
-Attention-based RNNs have proven effective in a variety of sequence transduction tasks \cite{bahdanau2014neural,cho2015describing}.
+Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \cite{bahdanau2014neural}, image captioning \cite{xu2015show}, and speech recognition \cite{chan2015listen,bahdanau2015end}.
 Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \cite{graves2014neural} and End-To-End Memory Network \cite{sukhbaatar2015end} models.
 
 \subsection{Feed-Forward Attention}
