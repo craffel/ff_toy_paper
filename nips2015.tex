@@ -195,7 +195,7 @@ We therefore tested our proposed feed-forward attention models for $T_0 \in \{50
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
 From these results, it's clear that the feed-forward attention model can quickly solve these long-term memory problems for longer sequence lengths than have been demonstrated with RNNs.
-Our model is also extremely efficient: Processing one epoch of 100,000 sequences with $T_0 = 5000$ took about two minutes using an NVIDIA GTX 980 Ti GPU.
+Our model is also efficient: Processing one epoch of 100,000 sequences with $T_0 = 10000$ took 254 seconds using an NVIDIA GTX 980 Ti GPU, while processing the same data with a single-layer vanilla RNN with a hidden dimensionality of 100 (resulting in a comparable number of parameters) took 917 seconds on the same hardware.
 In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in the number of parameters (10,602 vs.\ 10,501, or less than 1\%).
 
 \subsection{Variable-length Experiment}
