@@ -32,7 +32,7 @@ LabROSA, Columbia University\\
 \maketitle
 
 \begin{abstract}
-Recurrent neural networks (RNNs) have proven to be powerful models in problems where variable-length sequences are projected into a fixed-dimensional embedded space.
+Recurrent neural networks (RNNs) have proven to be powerful models in problems involving sequential data.
 Recently, RNNs have been augmented with ``attention'' mechanisms which allow the network to focus on different parts of an input sequence when computing their output.
 We propose a simplified model of attention which is applicable to feed-forward neural networks and demonstrate that it can solve some long-term memory problems (specifically, those where temporal order doesn't matter).
 In fact, we show empirically that our model can solve these problems for sequence lengths which are both longer and more widely varying than the best results attained with RNNs.
@@ -40,13 +40,12 @@ In fact, we show empirically that our model can solve these problems for sequenc
 
 \section{Models for Sequential Data}
 
-Many problems in machine learning are best formulated using sequential data, i.e.\ data where a given observation may be dependent on previous observations.
-Such problems can be coarsely classified as sequence transduction (producing a new sequence given an input sequence), sequence embedding (producing a single label, value, or vector from an entire sequence), or sequence generation (producing a sequence from no input).
+Many problems in machine learning are best formulated using sequential data (i.e.\ data where a given observation may be dependent on previous observations), such as sequence transduction (producing a new sequence given an input sequence), sequence classification (producing a single label from an entire sequence), or sequence embedding (producing a single vector from an entire sequence).
 Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 
 \subsection{Recurrent Neural Networks}
 
-One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the previous state $h_{t - 1}$.
+One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the model's previous state $h_{t - 1}$.
 In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
 A common approach is to use backpropagation through time \cite{werbos1990backpropagation}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
 Because the same function $f$ is applied repeatedly over time, this gradient can easily explode or vanish \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}.
@@ -58,12 +57,12 @@ Very long sequences can also make training computationally inefficient due to th
 
 A recently proposed method for easier modeling of long-term dependencies is ``attention''.
 Attention mechanisms allow for a more direct dependence between the state of the model at different points in time.
-Following the definition from \cite{bahdanau2014neural}, given a model which produces a hidden state $h_t$ at each time step, attention-based models first compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
+Following the definition from \cite{bahdanau2014neural}, given a model which produces a hidden state $h_t$ at each time step, attention-based models compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
 $$
 c_t = \sum_{j = 1}^T \alpha_{tj} h_j
 $$
 where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
-These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence prediction, the model's output at $t - 1$.
+These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence transduction, the model's output at $t - 1$.
 The weightings $\alpha_{ij}$ are then computed by
 \begin{align*}
 e_{tj} &= a(s_{t - 1}, h_j)\\
@@ -92,15 +91,15 @@ In this formulation, attention can be seen as producing a fixed-length embedding
 \begin{figure}
   \centering
   \includegraphics[width=.8\textwidth]{schematic.pdf}
-  \caption{Schematic of our proposed ``feedforward'' attention mechanism (cf.\ \cite{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
+  \caption{Schematic of our proposed ``feed-forward'' attention mechanism (cf.\ \cite{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
   \label{fig:schematic}
 \end{figure}
 
 
-A consequence of using an attention mechanism is that the context vector $c$ can model temporal dependencies because attention performs integration over time.
+A consequence of using an attention mechanism is the ability to integrate information over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
 Using a feed-forward $f$ could also result in large efficiency gains as the computation could be completely parallelized.
-While using a feed-forward model for sequential modeling sacrifices the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can perform arbitrary-length sequence embedding as effectively than RNNs.
+While using a feed-forward model for sequential modeling sacrifices the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can be more effective than RNNs.
 
 We note here that feed-forward models without attention can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$, i.e.
@@ -149,7 +148,7 @@ For all experiments, we set $D = 100$.
 
 We used the squared error of the output $y$ against the target value for each sequence as an objective.
 Parameters were optimized using ``adam'', a recently proposed stochastic optimization technique \cite{kingma2014adam}, with the optimization hyperparameters $\beta_1$ and $\beta_2$ set to the values suggested in \cite{kingma2014adam} (.9 and .999 respectively).
-All weight matrices were initialized with entries drawn from a Gaussian distribution with mean zero and, for a matrix $W \in \mathbb{R}^{M \times N}$, a standard deviation of $1/\sqrt{N}$.
+All weight matrices were initialized with entries drawn from a Gaussian distribution with a mean of zero and, for a matrix $W \in \mathbb{R}^{M \times N}$, a standard deviation of $1/\sqrt{N}$.
 All bias vectors were initialized with zeros.
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
@@ -175,14 +174,13 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
   \caption{Number of epochs required to achieve perfect accuracy, or accuracy after 100 epochs (greyed-out values), for the experiment described in Section \ref{sec:fixed}.}
   \label{tab:fixed}
 \end{table}
-\setlength{\textfloatsep}{14pt}
 
 \subsection{Fixed-Length Experiment}
 \label{sec:fixed}
 
 Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
-As $T_0$ increases, the model must be able to handle longer term dependencies.
-The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks and papers.
+As $T_0$ increases, the model must be able to handle longer-term dependencies.
+The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks, and papers.
 In the original paper describing the long short-term memory (LSTM) architecture \cite{hochreiter1997long}, a small LSTM network was shown to be able to solve the addition problem up to $T_0 = 1000$ and the multiplication problem up to $T_0 = 100$.
 \cite{martens2011learning} later showed that a ``vanilla'' (single-layer, densely-connected) recurrent network could solve both the addition and multiplication problems for $T_0 = 200$ when Hessian-Free optimization was used.
 The same model was used in \cite{sutskever2013importance}, where Nesterov's Accelerated Gradient was used instead for optimization which allowed the model to solve the addition and multiplication problems for $T_0 = 80$.
@@ -210,10 +208,10 @@ Using an unweighted average over time, we were only able to achieve accuracies o
 \section{Discussion}
 \label{sec:limitations}
 
-A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards temporal information.
+A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards order information.
 For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
 Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
-For example, in Joachims' seminal paper on text document categorization, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks'' \cite{joachims1998text}.
+For example, in Joachims' seminal paper on text document categorization \cite{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
 We also have shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
 Our results here further demonstrate that our model can be substantially more efficient than recurrent models on some classic long-term memory tasks.
 Further investigation on more real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/sequence-embedding/tree/master/toy_problems}{\texttt{https://github.com/craffel/sequence-embedding/tree/master/toy\char`_problems}}}
