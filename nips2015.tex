@@ -126,9 +126,10 @@ These two tasks are only a subset of the synthetic long-term memory problems whi
 For all experiments, we used the following model:
 First, the state $h_t$ was computed from the input at each time step $x_t$ by 
 $$
-h_t = \max(W_{xh}x_t + b_{xh}, 0.01)
+h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})
 $$
-where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$.
+where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed in \cite{maas2013rectifier}.
+We found that this nonlinearity improved early convergence so we used it in all of our models.
 We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with 
 $$
 a(h_t) =\tanh(W_{hc}h_t + b_{hc})
@@ -136,14 +137,13 @@ $$
 where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation \ref{eq:unweighted}.
 We then computed an intermediate vector 
 $$
-s = \max(W_{cs}c + b_{cs}, 0.01)
+s = \textrm{LReLU}(W_{cs}c + b_{cs})
 $$
 where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as
 $$
-y = \max(W_{sy}s + b_{sy}, 0.01)
+y = \textrm{LReLU}(W_{sy}s + b_{sy})
 $$
 where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
-The ``leaky rectifier'' nonlinearity $\textrm{LReLU}(x) = \max(x, .01)$ was proposed in \cite{maas2013rectifier}; we found that it improved early convergence so we used it in all of our models.
 For all experiments, we set $D = 100$.
 
 We used the squared error of the output $y$ against the target value for each sequence as an objective.
