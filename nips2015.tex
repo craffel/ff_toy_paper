@@ -86,7 +86,9 @@ c &= \sum_{t = 1}^T \alpha_t h_t
 \end{split}
 \end{align}
 As before, $a$ is a learnable function, but it now only depends on $h_t$.
-In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.  A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
+In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
+A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
+\cite{sonderby2015convolutional} compared the effectiveness of a standard recurrent network to a recurrent network augmented with this simplified version of attention on the task of protein sequence analysis.
 
 \begin{figure}
   \centering
