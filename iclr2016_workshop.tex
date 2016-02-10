@@ -1,5 +1,5 @@
 \documentclass{article} % For LaTeX2e
-\usepackage{nips15submit_e,times}
+\usepackage{iclr2016_workshop,times}
 \usepackage{hyperref}
 \usepackage{url}
 \usepackage{amssymb}
@@ -7,13 +7,10 @@
 \usepackage{booktabs}
 \usepackage{graphicx}
 
-%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
-
 \title{Feed-Forward Networks with Attention Can Solve Some Long-Term Memory Problems}
 
 
-\author{
-Colin Raffel\\
+\author{Colin Raffel\\
 LabROSA, Columbia University\\
 \texttt{craffel@gmail.com}
 \And
@@ -24,8 +21,6 @@ LabROSA, Columbia University\\
 
 \newcommand{\fix}{\marginpar{FIX}}
 \newcommand{\new}{\marginpar{NEW}}
-
-\nipsfinalcopy % Uncomment for camera-ready version
 
 \begin{document}
 
@@ -218,8 +213,7 @@ We also have shown in parallel work that our proposed feed-forward attention mod
 Our results here further demonstrate that our model can be substantially more efficient than recurrent models on some classic long-term memory tasks.
 Further investigation on more real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
-\bibliographystyle{unsrt}
-\small
 \bibliography{refs}
+\bibliographystyle{iclr2016_workshop}
 
 \end{document}

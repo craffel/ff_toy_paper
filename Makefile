@@ -1,4 +1,4 @@
-SRC = nips2015
+SRC = iclr2016_workshop
 
 all: $(SRC).tex
 	pdflatex $< 2>&1 | grep --color -E "Warning|Missing|$$"
