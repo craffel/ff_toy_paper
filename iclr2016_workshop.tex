@@ -82,16 +82,7 @@ c &= \sum_{t = 1}^T \alpha_t h_t
 \end{align}
 As before, $a$ is a learnable function, but it now only depends on $h_t$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
-A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
 \cite{sonderby2015convolutional} compared the effectiveness of a standard recurrent network to a recurrent network augmented with this simplified version of attention on the task of protein sequence analysis.
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.8\textwidth]{schematic.pdf}
-  \caption{Schematic of our proposed ``feed-forward'' attention mechanism (cf.\ \cite{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
-  \label{fig:schematic}
-\end{figure}
-
 
 A consequence of using an attention mechanism is the ability to integrate information over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
