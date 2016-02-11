@@ -59,10 +59,9 @@ $$
 where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
 These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence transduction, the model's output at $t - 1$.
 The weightings $\alpha_{ij}$ are then computed by
-\begin{align*}
-e_{tj} &= a(s_{t - 1}, h_j)\\
-\alpha_{tj} &= \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
-\end{align*}
+\begin{equation*}
+e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
+\end{equation*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
 Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \cite{bahdanau2014neural}, image captioning \cite{xu2015show}, and speech recognition \cite{chan2015listen,bahdanau2015end}.
@@ -72,14 +71,10 @@ Attention can be seen as analogous to the ``soft addressing'' mechanisms of the 
 
 A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence embedding tasks could be formulated as follows:
 Instead of a sequence of context vectors, we produce a single context vector $c$ as
-\begin{align}
-\begin{split}
+\begin{equation}
 \label{eq:ffattention}
-e_t &= a(h_t)\\
-\alpha_t &= \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}\\
-c &= \sum_{t = 1}^T \alpha_t h_t
-\end{split}
-\end{align}
+e_t = a(h_t), \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}, c = \sum_{t = 1}^T \alpha_t h_t
+\end{equation}
 As before, $a$ is a learnable function, but it now only depends on $h_t$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
 \cite{sonderby2015convolutional} compared the effectiveness of a standard recurrent network to a recurrent network augmented with this simplified version of attention on the task of protein sequence analysis.
@@ -112,26 +107,11 @@ These two tasks are only a subset of the synthetic long-term memory problems whi
 \subsection{Model Details}
 
 For all experiments, we used the following model:
-First, the state $h_t$ was computed from the input at each time step $x_t$ by 
-$$
-h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})
-$$
-where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed in \cite{maas2013rectifier}.
+First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed in \cite{maas2013rectifier}.
 We found that this nonlinearity improved early convergence so we used it in all of our models.
-We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with 
-$$
-a(h_t) =\tanh(W_{hc}h_t + b_{hc})
-$$
+We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$
 where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation \ref{eq:unweighted}.
-We then computed an intermediate vector 
-$$
-s = \textrm{LReLU}(W_{cs}c + b_{cs})
-$$
-where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as
-$$
-y = \textrm{LReLU}(W_{sy}s + b_{sy})
-$$
-where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
+We then computed an intermediate vector $s = \textrm{LReLU}(W_{cs}c + b_{cs})$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \textrm{LReLU}(W_{sy}s + b_{sy})$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
 For all experiments, we set $D = 100$.
 
 We used the squared error of the output $y$ against the target value for each sequence as an objective.
