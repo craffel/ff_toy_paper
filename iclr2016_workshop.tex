@@ -146,6 +146,8 @@ This suggests that a single feed-forward network with attention can simultaneous
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
 These results clearly show that our model can be substantially more efficient than recurrent models on some classic synthetic long-term memory tasks.
+A clear limitation of our proposed model is that it ignores temporal order because integrating over time discards order information.
+Nevertheless, we submit that in many cases, temporal order is substantially less important than being able to handle very long sequences.
 We are optimistic that this model will prove beneficial in real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 
 \bibliography{refs}
