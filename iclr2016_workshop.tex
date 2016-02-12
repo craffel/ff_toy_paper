@@ -37,7 +37,7 @@ We propose a simplified model of attention which is applicable to feed-forward n
 Many problems in machine learning are best formulated using sequential data (i.e.\ data where a given observation may be dependent on previous observations), such as sequence transduction (producing a new sequence given an input sequence), sequence classification (producing a single label from an entire sequence), or sequence embedding (producing a single vector from an entire sequence).
 Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the model's previous state $h_{t - 1}$.
-Training of RNNs with backpropagation is hindered by the vanishing and exploding gradient problem \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
+Training of RNNs with backpropagation through time \cite{werbos1990backpropagation} is hindered by the vanishing and exploding gradient problem \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
 \subsection{Attention}
