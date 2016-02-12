@@ -147,7 +147,8 @@ Using an unweighted average over time, we were only able to achieve accuracies o
 These results clearly show that our model can be substantially more efficient than recurrent models on some classic synthetic long-term memory tasks.
 A clear limitation of our proposed model is that it ignores temporal order because integrating over time discards order information.
 Nevertheless, we submit that in many cases, temporal order is substantially less important than being able to handle very long sequences.
-We are optimistic that this model will prove beneficial in real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
+In fact, we have shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
+We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 
 \bibliography{refs}
 \bibliographystyle{iclr2016_workshop}
