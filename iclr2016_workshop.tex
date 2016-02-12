@@ -37,15 +37,8 @@ In fact, we show empirically that our model can solve these problems for sequenc
 
 Many problems in machine learning are best formulated using sequential data (i.e.\ data where a given observation may be dependent on previous observations), such as sequence transduction (producing a new sequence given an input sequence), sequence classification (producing a single label from an entire sequence), or sequence embedding (producing a single vector from an entire sequence).
 Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
-
-\subsection{Recurrent Neural Networks}
-
 One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the model's previous state $h_{t - 1}$.
-In the supervised setting, the parameters of $f$ are optimized with respect to a loss function which measures $f$'s performance.
-A common approach is to use backpropagation through time \cite{werbos1990backpropagation}, which ``unrolls'' the RNN over time steps to compute the gradient of the parameters of $f$ with respect to the loss.
-Because the same function $f$ is applied repeatedly over time, this gradient can easily explode or vanish \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}.
-The use of gating architectures \cite{hochreiter1997long,cho2014learning}, sophisticated optimization techniques \cite{martens2011learning,sutskever2013importance}, gradient clipping \cite{pascanu2012difficulty,graves2013generating}, and/or careful initialization \cite{sutskever2013importance,jaegar2012long,mikolov2014learning,le2015simple} can help mitigate this issue and has facilitated the success of RNNs in a variety of fields (see e.g.\ \cite{graves2012supervised} for an overview).
-However, these approaches don't \textit{solve} the problem of vanishing and exploding gradients, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps \cite{martens2011learning,sutskever2013importance,le2015simple,hochreiter1997long,krueger2015regularizing,arjovsky2015unitary}.
+Training of RNNs with backpropagation is hindered by the vanishing and exploding gradient problem \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
 \subsection{Attention}
@@ -64,8 +57,6 @@ e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \ex
 \end{equation*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
-Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \cite{bahdanau2014neural}, image captioning \cite{xu2015show}, and speech recognition \cite{chan2015listen,bahdanau2015end}.
-Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \cite{graves2014neural} and End-To-End Memory Network \cite{sukhbaatar2015end} models.
 
 \subsection{Feed-Forward Attention}
 
@@ -82,7 +73,6 @@ In this formulation, attention can be seen as producing a fixed-length embedding
 A consequence of using an attention mechanism is the ability to integrate information over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
 Using a feed-forward $f$ could also result in large efficiency gains as the computation could be completely parallelized.
-While using a feed-forward model for sequential modeling sacrifices the ability to solve some problems, we show that for certain tasks, feed-forward networks with attention can be more effective than RNNs.
 
 We note here that feed-forward models without attention can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$, i.e.
@@ -96,13 +86,8 @@ We will also explore the effectiveness of this approach for sequence embedding.
 \section{Toy Long-Term Memory Problems}
 
 A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
-In this paper, we will focus on the ``addition'' and ``multiplication'' problems, which can be summarized as follows:
-The input is a two dimensional sequence, where one dimension is a random sequence sampled uniformly from $[0, 1]$ and the other dimension is a ``mask'' sequence.
-At two time steps, one in the first ten sequence steps and one before the sequence's midpoint, the ``mask'' signal is 1; at the first and last time step it is -1; and at all other time steps it is 0.
-The goal is to perform addition or multiplication on the two values in the noise dimension which co-occur with the 1s in the mask dimension, which is meant to require that a model be able to store the correct values for the duration of the sequence.
-A sequence is considered correctly processed if the absolute difference between the predicted and target values is less than $.04$.
-Slight variants of these tasks have also been used \cite{sutskever2013importance,le2015simple,jaegar2012long,martens2011learning}, but we will follow the original definition from \cite{hochreiter1997long}.
-These two tasks are only a subset of the synthetic long-term memory problems which have been proposed; we focus on them here because they are the most commonly used and discuss the applicability of feed-forward attention on the remaining problems in Section \ref{sec:limitations}.
+In this paper, we will focus on the ``addition'' and ``multiplication'' problems; due to space constraints, we refer the reader to \cite{hochreiter1997long} or \cite{sutskever2013importance} for their specification.
+All of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
 \subsection{Model Details}
 
@@ -144,15 +129,7 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
 
 Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
 As $T_0$ increases, the model must be able to handle longer-term dependencies.
-The largest value of $T_0$ for which high accuracy was attained on a held-out test set varies across models, tasks, and papers.
-In the original paper describing the long short-term memory (LSTM) architecture \cite{hochreiter1997long}, a small LSTM network was shown to be able to solve the addition problem up to $T_0 = 1000$ and the multiplication problem up to $T_0 = 100$.
-\cite{martens2011learning} later showed that a ``vanilla'' (single-layer, densely-connected) recurrent network could solve both the addition and multiplication problems for $T_0 = 200$ when Hessian-Free optimization was used.
-The same model was used in \cite{sutskever2013importance}, where Nesterov's Accelerated Gradient was used instead for optimization which allowed the model to solve the addition and multiplication problems for $T_0 = 80$.
-By initializing a similarly structured recurrent network's hidden-to-hidden weights to an identity matrix and using a rectifier activation function, \cite{le2015simple} solved the addition problem up to $T_0 = 300$, which they claimed outperformed an LSTM model.
-More recently, \cite{krueger2015regularizing} utilized a regularizer which encourages subsequent hidden states to have similar norms, allowing a vanilla recurrent network to achieve some success on the addition problem for $T_0 = 400$.
-Related work in \cite{arjovsky2015unitary} showed that enforcing an orthogonality constraint on the hidden-to-hidden weight matrix of a vanilla RNN allowed it to nearly solve the addition problem for $T_0 = 400$ and achieve some success for $T_0 = 750$.
-Finally, in \cite{jaegar2012long} the addition and multiplication tasks were solved for $T_0 = 10000$ and $T_0 = 1000$ respectively by using a recurrent network with a very large and carefully initialized hidden-to-hidden weight matrix which was not optimized, which sidesteps the issue of vanishing and exploding gradients.
-
+The largest value of $T_0$ attained using RNNs with different training, regularization, and model structures has varied from a few hundred \cite{martens2011learning,sutskever2013importance,le2015simple,krueger2015regularizing,arjovsky2015unitary} to a few thousand \cite{hochreiter1997long,jaegar2012long}.
 We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000, 10000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
@@ -169,16 +146,8 @@ Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test
 This suggests that a single feed-forward network with attention can simultaneously model both short-term and very long-term dependencies, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
-\section{Discussion}
-\label{sec:limitations}
-
-A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards order information.
-For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
-Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
-For example, in Joachims' seminal paper on text document categorization \cite{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
-We also have shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
-Our results here further demonstrate that our model can be substantially more efficient than recurrent models on some classic long-term memory tasks.
-Further investigation on more real-world problems is warranted; for interested researchers, all of the code used in this experiment is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
+These results clearly show that our model can be substantially more efficient than recurrent models on some classic synthetic long-term memory tasks.
+We are optimistic that this model will prove beneficial in real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 
 \bibliography{refs}
 \bibliographystyle{iclr2016_workshop}
