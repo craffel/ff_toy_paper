@@ -56,6 +56,8 @@ e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \ex
 \end{equation*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
+Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \cite{bahdanau2014neural}, image captioning \cite{xu2015show}, and speech recognition \cite{chan2015listen,bahdanau2015end}.
+Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \cite{graves2014neural} and End-To-End Memory Network \cite{sukhbaatar2015end} models.
 
 \subsection{Feed-Forward Attention}
 
@@ -67,7 +69,15 @@ e_t = a(h_t), \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}, c = \sum_{t
 \end{equation}
 As before, $a$ is a learnable function, but it now only depends on $h_t$.
 In this formulation, attention can be seen as producing a fixed-length embedding $c$ of the input sequence by computing an adaptive weighted average of the state sequence $h$.
+A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
 \cite{sonderby2015convolutional} compared the effectiveness of a standard recurrent network to a recurrent network augmented with this simplified version of attention on the task of protein sequence analysis.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\textwidth]{schematic.pdf}
+  \caption{Schematic of our proposed ``feed-forward'' attention mechanism (cf.\ \cite{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
+  \label{fig:schematic}
+\end{figure}
 
 A consequence of using an attention mechanism is the ability to integrate information over time.
 It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
@@ -79,6 +89,7 @@ An obvious straightforward choice, which can be seen as an extreme oversimplific
 \label{eq:unweighted}
 c = \frac{1}{T}\sum_{t = 1}^T h_t
 \end{equation}
+This form of integration is similar to the ``global temporal pooling'' described in \cite{dieleman2014recommending}, which is based on the ``global average pooling'' technique of \cite{lin2014network}.
 We will also explore the effectiveness of this approach for sequence embedding.
 
 \section{Toy Long-Term Memory Problems}
@@ -145,10 +156,13 @@ Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test
 This suggests that a single feed-forward network with attention can simultaneously model both short-term and very long-term dependencies, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
-These results clearly show that our model can be substantially more efficient than recurrent models on some classic synthetic long-term memory tasks.
-A clear limitation of our proposed model is that it ignores temporal order because integrating over time discards order information.
-Nevertheless, we submit that in many cases, temporal order is substantially less important than being able to handle very long sequences.
-In fact, we have shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
+\subsection{Discussion}
+
+A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards order information.
+For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
+Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
+For example, in Joachims' seminal paper on text document categorization \cite{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
+We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
 We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 
 \bibliography{refs}
