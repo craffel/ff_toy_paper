@@ -34,8 +34,7 @@ We propose a simplified model of attention which is applicable to feed-forward n
 
 \section{Models for Sequential Data}
 
-Many problems in machine learning are best formulated using sequential data (i.e.\ data where a given observation may be dependent on previous observations), such as sequence transduction (producing a new sequence given an input sequence), sequence classification (producing a single label from an entire sequence), or sequence embedding (producing a single vector from an entire sequence).
-Appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
+Many problems in machine learning are best formulated using sequential data and appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the model's previous state $h_{t - 1}$.
 Training of RNNs with backpropagation through time \cite{werbos1990backpropagation} is hindered by the vanishing and exploding gradient problem \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
@@ -49,7 +48,7 @@ $$
 c_t = \sum_{j = 1}^T \alpha_{tj} h_j
 $$
 where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
-These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and, for sequence transduction, the model's output at $t - 1$.
+These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and the model's output at $t - 1$.
 The weightings $\alpha_{ij}$ are then computed by
 \begin{equation*}
 e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
@@ -61,8 +60,7 @@ Attention can be seen as analogous to the ``soft addressing'' mechanisms of the 
 
 \subsection{Feed-Forward Attention}
 
-A straightforward simplification to the attention mechanism described above which would allow it to be applied to sequence embedding tasks could be formulated as follows:
-Instead of a sequence of context vectors, we produce a single context vector $c$ as
+A straightforward simplification to the attention mechanism described above which would allow it to be used to produce a single vector $c$ from an entire sequence could be formulated as follows:
 \begin{equation}
 \label{eq:ffattention}
 e_t = a(h_t), \alpha_t = \frac{\exp(e_t)}{\sum_{k = 1}^T \exp(e_k)}, c = \sum_{t = 1}^T \alpha_t h_t
@@ -80,17 +78,17 @@ A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
 \end{figure}
 
 A consequence of using an attention mechanism is the ability to integrate information over time.
-It follows that by using this simplified form of attention, a model could perform sequence embedding even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
+It follows that by using this simplified form of attention, a model could handle variable-length sequences even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
 Using a feed-forward $f$ could also result in large efficiency gains as the computation could be completely parallelized.
 
-We note here that feed-forward models without attention can be used for sequence embedding when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
+We note here that feed-forward models without attention can be used when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$, i.e.
 \begin{equation}
 \label{eq:unweighted}
 c = \frac{1}{T}\sum_{t = 1}^T h_t
 \end{equation}
 This form of integration is similar to the ``global temporal pooling'' described in \cite{dieleman2014recommending}, which is based on the ``global average pooling'' technique of \cite{lin2014network}.
-We will also explore the effectiveness of this approach for sequence embedding.
+We will also explore the effectiveness of this approach.
 
 \section{Toy Long-Term Memory Problems}
 
