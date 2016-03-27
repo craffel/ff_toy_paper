@@ -93,7 +93,8 @@ We will also explore the effectiveness of this approach.
 A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
 In this paper, we will focus on the ``addition'' and ``multiplication'' problems; due to space constraints, we refer the reader to \cite{hochreiter1997long} or \cite{sutskever2013importance} for their specification.
 As proposed in \cite{hochreiter1997long}, we define accuracy as the proportion of sequences for which the absolute error between predicted value and the target value was less than .04.
-All of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
+Applying our feed-forward model to these tasks is somewhat disingenuous because they are commutative and therefore may be easier to solve with a model which ignores temporal order.
+However, as we further argue in Section \ref{sec:discussion}, we believe these tasks provide a useful demonstration of our model's ability to refer to arbitrary locations in the input sequence when computing its output.
 
 \subsection{Model Details}
 
@@ -139,20 +140,21 @@ The largest value of $T_0$ attained using RNNs with different training, regulari
 We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000, 10000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
-From these results, it's clear that the feed-forward attention model can quickly solve these long-term memory problems for longer sequence lengths than have been demonstrated with RNNs.
+From these results, it's clear that the feed-forward attention model can quickly solve these long-term memory problems for all sequence lengths we tested.
 Our model is also efficient: Processing one epoch of 100,000 sequences with $T_0 = 10000$ took 254 seconds using an NVIDIA GTX 980 Ti GPU, while processing the same data with a single-layer vanilla RNN with a hidden dimensionality of 100 (resulting in a comparable number of parameters) took 917 seconds on the same hardware.
 In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in the number of parameters (10,602 vs.\ 10,501, or less than 1\%).
 
 \subsection{Variable-length Experiment}
 
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
-To our knowledge, such an experiment has not been conducted with RNNs.
+To our knowledge, such a variant of these tasks has not been studied before.
 We trained models of the same architecture as used in the previous experiment on minibatches of sequences whose lengths were chosen uniformly at random between 50 and 10000 time steps.
 Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task after training for 100 epochs.
-This suggests that a single feed-forward network with attention can simultaneously model both short-term and very long-term dependencies, with a marginal decrease in accuracy.
+This suggests that a single feed-forward network with attention can simultaneously handle both short and very long sequences, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
 \subsection{Discussion}
+\label{sec:discussion}
 
 A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards order information.
 For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
@@ -161,6 +163,7 @@ For example, in Joachims' seminal paper on text document categorization \cite{jo
 In fact, the current state-of-the-art system for document classification still uses order-agnostic sequence integration \cite{lei2015molding}.
 We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
 We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
+All of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
 \bibliography{refs}
 \bibliographystyle{iclr2016_workshop}
