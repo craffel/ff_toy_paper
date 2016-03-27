@@ -101,8 +101,8 @@ However, as we further argue in Section \ref{sec:discussion}, we believe these t
 For all experiments, we used the following model:
 First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed in \cite{maas2013rectifier}.
 We found that this nonlinearity improved early convergence so we used it in all of our models.
-We tested models where the context vector $c$ was then computed either as in Equation \ref{eq:ffattention}, with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$
-where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation \ref{eq:unweighted}.
+We tested models where the context vector $c$ was then computed either as in Equation (\ref{eq:ffattention}), with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$
+where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation (\ref{eq:unweighted}).
 We then computed an intermediate vector $s = \textrm{LReLU}(W_{cs}c + b_{cs})$ where $W_{cs} \in \mathbb{R}^{D \times D}, b \in \mathbb{R}^D$ from which the output was computed as $y = \textrm{LReLU}(W_{sy}s + b_{sy})$ where $W_{sy} \in \mathbb{R}^{1 \times D}$, $b_{sy} \in \mathbb{R}$.
 For all experiments, we set $D = 100$.
 
@@ -142,14 +142,14 @@ The required number of epochs or accuracy after 100 epochs for each task, sequen
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
 From these results, it's clear that the feed-forward attention model can quickly solve these long-term memory problems for all sequence lengths we tested.
 Our model is also efficient: Processing one epoch of 100,000 sequences with $T_0 = 10000$ took 254 seconds using an NVIDIA GTX 980 Ti GPU, while processing the same data with a single-layer vanilla RNN with a hidden dimensionality of 100 (resulting in a comparable number of parameters) took 917 seconds on the same hardware.
-In addition, there is a clear benefit to using the attention mechanism of Equation \ref{eq:ffattention} instead of a simple unweighted average over time, which only incurs a marginal increase in the number of parameters (10,602 vs.\ 10,501, or less than 1\%).
+In addition, there is a clear benefit to using the attention mechanism of Equation (\ref{eq:ffattention}) instead of a simple unweighted average over time, which only incurs a marginal increase in the number of parameters (10,602 vs.\ 10,501, or less than 1\%).
 
 \subsection{Variable-length Experiment}
 
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such a variant of these tasks has not been studied before.
 We trained models of the same architecture as used in the previous experiment on minibatches of sequences whose lengths were chosen uniformly at random between 50 and 10000 time steps.
-Using the attention mechanism of Equation \ref{eq:ffattention}, on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task after training for 100 epochs.
+Using the attention mechanism of Equation (\ref{eq:ffattention}), on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task after training for 100 epochs.
 This suggests that a single feed-forward network with attention can simultaneously handle both short and very long sequences, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
 
