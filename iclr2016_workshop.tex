@@ -34,14 +34,14 @@ We propose a simplified model of attention which is applicable to feed-forward n
 
 Many problems in machine learning are best formulated using sequential data and appropriate models for these tasks must be able to capture temporal dependencies in sequences, potentially of arbitrary length.
 One such class of models are recurrent neural networks (RNNs), which can be considered a learnable function $f$ whose output $h_t = f(x_t, h_{t - 1})$ at time $t$ depends on input $x_t$ and the model's previous state $h_{t - 1}$.
-Training of RNNs with backpropagation through time \cite{werbos1990backpropagation} is hindered by the vanishing and exploding gradient problem \cite{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
+Training of RNNs with backpropagation through time \citep{werbos1990backpropagation} is hindered by the vanishing and exploding gradient problem \citep{pascanu2012difficulty,hochreiter1997long,bengio1994learning}, and as a result RNNs are in practice typically only applied in tasks where sequential dependencies span at most hundreds of time steps.
 Very long sequences can also make training computationally inefficient due to the fact that RNNs must be evaluated sequentially and cannot be fully parallelized.
 
 \subsection{Attention}
 
 A recently proposed method for easier modeling of long-term dependencies is ``attention''.
 Attention mechanisms allow for a more direct dependence between the state of the model at different points in time.
-Following the definition from \cite{bahdanau2014neural}, given a model which produces a hidden state $h_t$ at each time step, attention-based models compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
+Following the definition from \citep{bahdanau2014neural}, given a model which produces a hidden state $h_t$ at each time step, attention-based models compute a ``context'' vector $c_t$ as the weighted mean of the state sequence $h$ by
 $$
 c_t = \sum_{j = 1}^T \alpha_{tj} h_j
 $$
@@ -53,8 +53,8 @@ e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \ex
 \end{equation*}
 where $a$ is a learned function which can be thought of as computing a scalar importance value for $h_j$ given the value of $h_j$ and the previous state $s_{t - 1}$.
 This formulation allows the new state sequence $s$ to have more direct access to the entire state sequence $h$.
-Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \cite{bahdanau2014neural}, image captioning \cite{xu2015show}, and speech recognition \cite{chan2015listen,bahdanau2015end}.
-Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \cite{graves2014neural} and End-To-End Memory Network \cite{sukhbaatar2015end} models.
+Attention-based RNNs have proven effective in a variety of sequence transduction tasks, including machine translation \citep{bahdanau2014neural}, image captioning \citep{xu2015show}, and speech recognition \citep{chan2015listen,bahdanau2015end}.
+Attention can be seen as analogous to the ``soft addressing'' mechanisms of the recently proposed Neural Turing Machine \citep{graves2014neural} and End-To-End Memory Network \citep{sukhbaatar2015end} models.
 
 \subsection{Feed-Forward Attention}
 
@@ -71,7 +71,7 @@ A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
 \begin{figure}
   \centering
   \includegraphics[width=.8\textwidth]{schematic.pdf}
-  \caption{Schematic of our proposed ``feed-forward'' attention mechanism (cf.\ \cite{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
+  \caption{Schematic of our proposed ``feed-forward'' attention mechanism (cf.\ \citep{cho2015introduction} Figure 1).  Vectors in the hidden state sequence $h_t$ are fed into the learnable function $a(h_t)$ to produce a probability vector $\alpha$.  The vector $c$ is computed as a weighted average of $h_t$, with weighting given by $\alpha$.}
   \label{fig:schematic}
 \end{figure}
 
@@ -85,21 +85,21 @@ An obvious straightforward choice, which can be seen as an extreme oversimplific
 \label{eq:unweighted}
 c = \frac{1}{T}\sum_{t = 1}^T h_t
 \end{equation}
-This form of integration has been used to collapse the temporal dimension of audio \cite{dieleman2014recommending} and text document \cite{lei2015molding} sequences.
+This form of integration has been used to collapse the temporal dimension of audio \citep{dieleman2014recommending} and text document \citep{lei2015molding} sequences.
 We will also explore the effectiveness of this approach.
 
 \section{Toy Long-Term Memory Problems}
 
-A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed in \cite{hochreiter1997long}.
-In this paper, we will focus on the ``addition'' and ``multiplication'' problems; due to space constraints, we refer the reader to \cite{hochreiter1997long} or \cite{sutskever2013importance} for their specification.
-As proposed in \cite{hochreiter1997long}, we define accuracy as the proportion of sequences for which the absolute error between predicted value and the target value was less than .04.
+A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed by \cite{hochreiter1997long}.
+In this paper, we will focus on the ``addition'' and ``multiplication'' problems; due to space constraints, we refer the reader to \citep{hochreiter1997long} or \citep{sutskever2013importance} for their specification.
+As proposed by \cite{hochreiter1997long}, we define accuracy as the proportion of sequences for which the absolute error between predicted value and the target value was less than .04.
 Applying our feed-forward model to these tasks is somewhat disingenuous because they are commutative and therefore may be easier to solve with a model which ignores temporal order.
 However, as we further argue in Section \ref{sec:discussion}, we believe these tasks provide a useful demonstration of our model's ability to refer to arbitrary locations in the input sequence when computing its output.
 
 \subsection{Model Details}
 
 For all experiments, we used the following model:
-First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed in \cite{maas2013rectifier}.
+First, the state $h_t$ was computed from the input at each time step $x_t$ by $h_t = \textrm{LReLU}(W_{xh}x_t + b_{xh})$ where $W_{xh} \in \mathbb{R}^{D \times 2}, b_{xh} \in \mathbb{R}^D$ and $\textrm{LReLU}(x) = \max(x, .01x)$ is the ``leaky rectifier'' nonlinearity, as proposed by \cite{maas2013rectifier}.
 We found that this nonlinearity improved early convergence so we used it in all of our models.
 We tested models where the context vector $c$ was then computed either as in Equation (\ref{eq:ffattention}), with $a(h_t) =\tanh(W_{hc}h_t + b_{hc})$
 where $W_{hc} \in \mathbb{R}^{1 \times D}, b_{hc} \in \mathbb{R}$, or simply as the unweighted mean of $h$ as in Equation (\ref{eq:unweighted}).
@@ -107,12 +107,12 @@ We then computed an intermediate vector $s = \textrm{LReLU}(W_{cs}c + b_{cs})$ w
 For all experiments, we set $D = 100$.
 
 We used the squared error of the output $y$ against the target value for each sequence as an objective.
-Parameters were optimized using ``adam'', a recently proposed stochastic optimization technique \cite{kingma2014adam}, with the optimization hyperparameters $\beta_1$ and $\beta_2$ set to the values suggested in \cite{kingma2014adam} (.9 and .999 respectively).
+Parameters were optimized using ``adam'', a recently proposed stochastic optimization technique \citep{kingma2014adam}, with the optimization hyperparameters $\beta_1$ and $\beta_2$ set to the values suggested by \cite{kingma2014adam} (.9 and .999 respectively).
 All weight matrices were initialized with entries drawn from a Gaussian distribution with a mean of zero and, for a matrix $W \in \mathbb{R}^{M \times N}$, a standard deviation of $1/\sqrt{N}$.
 All bias vectors were initialized with zeros.
 We trained on mini-batches of 100 sequences and computed the accuracy on a held-out test set of 1000 sequences every epoch, defined as 1000 parameter updates.
 We stopped training when either 100\% accuracy was attained on the test set, or after 100 epochs.
-All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is built on top of Theano \cite{bastien2012theano,bergstra2010theano}.
+All networks were implemented using Lasagne \citep{dieleman2015lasagne}, which is built on top of Theano \citep{bastien2012theano,bergstra2010theano}.
 
 \begin{table}
   \centering
@@ -136,7 +136,7 @@ All networks were implemented using Lasagne \cite{dieleman2015lasagne}, which is
 
 Traditionally, the sequence lengths tested in each task vary uniformly between $[T_0, 1.1T_0]$ for different values of $T_0$.
 As $T_0$ increases, the model must be able to handle longer-term dependencies.
-The largest value of $T_0$ attained using RNNs with different training, regularization, and model structures has varied from a few hundred \cite{martens2011learning,sutskever2013importance,le2015simple,krueger2015regularizing,arjovsky2015unitary} to a few thousand \cite{hochreiter1997long,jaegar2012long}.
+The largest value of $T_0$ attained using RNNs with different training, regularization, and model structures has varied from a few hundred \citep{martens2011learning,sutskever2013importance,le2015simple,krueger2015regularizing,arjovsky2015unitary} to a few thousand \citep{hochreiter1997long,jaegar2012long}.
 We therefore tested our proposed feed-forward attention models for $T_0 \in \{50, 100, 500, 1000, 5000, 10000\}$.
 The required number of epochs or accuracy after 100 epochs for each task, sequence length, and temporal integration method (adaptively weighted attention or unweighted mean) is shown in Table \ref{tab:fixed}.
 For fair comparison, we report the best result achieved using any learning rate in $\{.0003, .001, .003, .01\}$.
@@ -157,11 +157,11 @@ Using an unweighted average over time, we were only able to achieve accuracies o
 \label{sec:discussion}
 
 A clear limitation of our proposed model is that it will fail on any task where temporal order matters because computing an average over time discards order information.
-For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
+For example, on the two-symbol temporal order task \citep{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
 Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
-For example, in Joachims' seminal paper on text document categorization \cite{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
-In fact, the current state-of-the-art system for document classification still uses order-agnostic sequence integration \cite{lei2015molding}.
-We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
+For example, in Joachims' seminal paper on text document categorization \citep{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
+In fact, the current state-of-the-art system for document classification still uses order-agnostic sequence integration \citep{lei2015molding}.
+We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \citep{raffel2016pruning}.
 We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 All of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
