@@ -162,12 +162,17 @@ Nevertheless, we submit that for some real-world tasks involving sequential data
 For example, in Joachims' seminal paper on text document categorization \citep{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
 In fact, the current state-of-the-art system for document classification still uses order-agnostic sequence integration \citep{lei2015molding}.
 We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \citep{raffel2016pruning}.
-We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
-All of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
+
+Our experiments explicitly demonstrate that including an attention mechanism can allow a model to refer to specific points in a sequence when computing its output.
+They also provide an alternate argument for the claim made in \citep{bahdanau2014neural} that attention helps models handle very long and widely variable-length sequences.
+Furthermore, we are optimistic that our proposed feed-forward model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences.
+Further investigation is warranted; to facilitate future work, all of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
 \section{Acknowledgements}
 
 We thank Sander Dieleman, Bart van Merri{\"e}nboer, S{\o}ren Kaae S{\o}nderby, Brian McFee, and our anonymous reviewers for discussion and feedback.
+
+\clearpage
 
 \bibliography{refs}
 \bibliographystyle{iclr2016_workshop}
