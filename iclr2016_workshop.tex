@@ -85,7 +85,7 @@ An obvious straightforward choice, which can be seen as an extreme oversimplific
 \label{eq:unweighted}
 c = \frac{1}{T}\sum_{t = 1}^T h_t
 \end{equation}
-This form of integration is similar to the ``global temporal pooling'' described in \cite{dieleman2014recommending}, which is based on the ``global average pooling'' technique of \cite{lin2014network}.
+This form of integration has been used to collapse the temporal dimension of audio \cite{dieleman2014recommending} and text document \cite{lei2015molding} sequences.
 We will also explore the effectiveness of this approach.
 
 \section{Toy Long-Term Memory Problems}
@@ -158,6 +158,7 @@ A clear limitation of our proposed model is that it will fail on any task where 
 For example, on the two-symbol temporal order task \cite{hochreiter1997long} where a sequence must be classified in terms of whether two symbols $X$ and $Y$ appear in the order $X, X$; $Y, Y$; $X, Y$; or $Y, X$, our model can differentiate between the $X, X$ and $Y, Y$ cases perfectly but cannot differentiate between the $X, Y$ and $Y, X$ cases at all.
 Nevertheless, we submit that for some real-world tasks involving sequential data, temporal order is substantially less important than being able to handle very long sequences.
 For example, in Joachims' seminal paper on text document categorization \cite{joachims1998text}, he posits that ``word stems work well as representation units and that their ordering in a document is of minor importance for many tasks''.
+In fact, the current state-of-the-art system for document classification still uses order-agnostic sequence integration \cite{lei2015molding}.
 We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \cite{raffel2016pruning}.
 We are optimistic that this model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences; further investigation is warranted.
 
