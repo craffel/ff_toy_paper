@@ -50,6 +50,7 @@ Icon
 *.vrb
 *.xdy
 *.tdo
+*.pdf
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
