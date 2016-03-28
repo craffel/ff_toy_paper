@@ -78,8 +78,9 @@ A schematic of this form of attention is shown in Figure \ref{fig:schematic}.
 A consequence of using an attention mechanism is the ability to integrate information over time.
 It follows that by using this simplified form of attention, a model could handle variable-length sequences even if the calculation of $h_t$ was feed-forward, i.e.\ $h_t = f(x_t)$.
 Using a feed-forward $f$ could also result in large efficiency gains as the computation could be completely parallelized.
+We investigate the capabilities of this ``feed-forward attention'' model in Section \ref{sec:experiments}.
 
-We note here that feed-forward models without attention can be used when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
+We note here that feed-forward models without attention can be used for sequential data when the sequence length $T$ is fixed, but when $T$ varies across sequences, some form of temporal integration is necessary.
 An obvious straightforward choice, which can be seen as an extreme oversimplification of attention, would be to compute $c$ as the unweighted average of the state sequence $h_t$, i.e.
 \begin{equation}
 \label{eq:unweighted}
@@ -89,6 +90,7 @@ This form of integration has been used to collapse the temporal dimension of aud
 We will also explore the effectiveness of this approach.
 
 \section{Toy Long-Term Memory Problems}
+\label{sec:experiments}
 
 A common way to measure the long-term memory capabilities of a given model is to test it on the synthetic problems originally proposed by \cite{hochreiter1997long}.
 In this paper, we will focus on the ``addition'' and ``multiplication'' problems; due to space constraints, we refer the reader to \citep{hochreiter1997long} or \citep{sutskever2013importance} for their specification.
@@ -148,7 +150,7 @@ In addition, there is a clear benefit to using the attention mechanism of Equati
 
 Because the range of sequence lengths $[T_0, 1.1T_0]$ is small compared to the range of $T_0$ values we evaluated, we further tested whether it was possible to train a single model which could cope with sequences with highly varying lengths.
 To our knowledge, such a variant of these tasks has not been studied before.
-We trained models of the same architecture as used in the previous experiment on minibatches of sequences whose lengths were chosen uniformly at random between 50 and 10000 time steps.
+We trained models of the same architecture used in the previous experiment on minibatches of sequences whose lengths were chosen uniformly at random between 50 and 10000 time steps.
 Using the attention mechanism of Equation (\ref{eq:ffattention}), on held-out test sets of 1000 sequences, our model achieved 99.9\% accuracy on the addition task and 99.4\% on the multiplication task after training for 100 epochs.
 This suggests that a single feed-forward network with attention can simultaneously handle both short and very long sequences, with a marginal decrease in accuracy.
 Using an unweighted average over time, we were only able to achieve accuracies of 77.4\% and 55.5\% on the variable-length addition and multiplication tasks, respectively.
@@ -164,8 +166,8 @@ In fact, the current state-of-the-art system for document classification still u
 We have also shown in parallel work that our proposed feed-forward attention model can be used effectively for pruning large-scale (sub)sequence retrieval searches, even when the sequences are very long and high-dimensional \citep{raffel2016pruning}.
 
 Our experiments explicitly demonstrate that including an attention mechanism can allow a model to refer to specific points in a sequence when computing its output.
-They also provide an alternate argument for the claim made in \citep{bahdanau2014neural} that attention helps models handle very long and widely variable-length sequences.
-Furthermore, we are optimistic that our proposed feed-forward model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences.
+They also provide an alternate argument for the claim made by \cite{bahdanau2014neural} that attention helps models handle very long and widely variable-length sequences.
+We are optimistic that our proposed feed-forward model will prove beneficial in additional real-world problems requiring order-agnostic temporal integration of long sequences.
 Further investigation is warranted; to facilitate future work, all of the code used in our experiments is available online.\footnote{\href{https://github.com/craffel/ff-attention/tree/master/toy_problems}{\texttt{https://github.com/craffel/ff-attention/tree/master/toy\char`_problems}}}
 
 \section{Acknowledgements}
