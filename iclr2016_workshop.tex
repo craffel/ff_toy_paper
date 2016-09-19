@@ -47,7 +47,7 @@ c_t = \sum_{j = 1}^T \alpha_{tj} h_j
 $$
 where $T$ is the total number of time steps in the input sequence and $\alpha_{tj}$ is a weight computed at each time step $t$ for each state $h_j$.
 These context vectors are then used to compute a new state sequence $s$, where $s_t$ depends on $s_{t - 1}$, $c_t$ and the model's output at $t - 1$.
-The weightings $\alpha_{ij}$ are then computed by
+The weightings $\alpha_{tj}$ are then computed by
 \begin{equation*}
 e_{tj} = a(s_{t - 1}, h_j), \alpha_{tj} = \frac{\exp(e_{tj})}{\sum_{k = 1}^T \exp(e_{tk})}
 \end{equation*}
